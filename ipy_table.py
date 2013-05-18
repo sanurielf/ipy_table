@@ -57,6 +57,14 @@ This project is maintained at http://github.com/epmoyer/ipy_table
 
 import copy
 
+# Try to import numpy library
+try:
+    import numpy
+except ImportError:
+    pass
+
+    
+
 
 __version__ = 1.12
 
@@ -77,12 +85,31 @@ class IpyTable(object):
     # External methods
     #---------------------------------
 
-    def __init__(self, array):
+    def __init__(self, input_data, order):
+        """Receive python dictionary as input. Sort the dictionary
+        as the 'order' list
+        The dictionary can have numpy arrays
+        """
+        
+        if type(input_data) is dict and order:
+            header = order
+            values = []
+            for key in order:
+                values.append(_convert_to_list(input_data[key]))
+            values = map(list, zip(*values))
+            array = [header] + values
+        elif type(input_data) is list:
+            array = input_data
+            
+            
+        
         self.array = array
 
         self._num_rows = len(array)
         self._num_columns = len(array[0])
-
+        
+        
+        
         # Check that array is well formed
         for row in array:
             if len(row) != self._num_columns:
@@ -402,11 +429,11 @@ def tabulate(data_list, columns, interactive=True):
     return get_interactive_return_value()
 
 
-def make_table(array, interactive=True):
+def make_table(array,order= None , interactive=True):
     """Create a table in interactive mode."""
     global _TABLE
     global _INTERACTIVE
-    _TABLE = IpyTable(array)
+    _TABLE = IpyTable(array, order)
     _INTERACTIVE = interactive
     return get_interactive_return_value()
 
