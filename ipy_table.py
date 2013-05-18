@@ -56,12 +56,7 @@ This project is maintained at http://github.com/epmoyer/ipy_table
 """
 
 import copy
-
-# Try to import numpy library
-try:
-    import numpy
-except ImportError:
-    pass
+import sys
 
     
 
@@ -86,25 +81,28 @@ class IpyTable(object):
     #---------------------------------
 
     def __init__(self, input_data, order):
-        """Receive python dictionary as input. Sort the dictionary
-        as the 'order' list
-        The dictionary can have numpy arrays
+        """Receive Python dictionary as input. Sort the dictionary
+        as the 'order' list. The dictionary can have numpy arrays
+        Also can receive a list o lists
         """
         
+        
         if type(input_data) is dict and order:
-            header = order
+            # Convert dict to a list o lists
             values = []
             for key in order:
                 values.append(_convert_to_list(input_data[key]))
             values = map(list, zip(*values))
-            array = [header] + values
+            array = [order] + values
         elif type(input_data) is list:
             array = input_data
+        else:
+            sys.exit('Input data must be: \n -List of lists \n -Dictionary with a list of the order of keys to use.')
+            
             
             
         
         self.array = array
-
         self._num_rows = len(array)
         self._num_columns = len(array[0])
         
